@@ -10,7 +10,6 @@ from keras.layers import Embedding, Dense, LSTM, GlobalMaxPool1D, Dropout
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 
-MAX_LENGTH = 400
 LABELS = ['toxic', 'severe_toxic', 'obscene', 'threat', 'insult', 'identity_hate']
 EMBEDDINGS = {
     "GloVe 6B 50D": "glove.6B.50d.txt",
@@ -22,42 +21,17 @@ EMBEDDINGS = {
 
 
 def main():
-    train_df = pd.read_csv('data/train.csv.zip')
-    train_df['comment_text'] = train_df['comment_text'].apply(clean_comment)
-    list_comment_train = list(train_df['comment_text'])
 
-    tokenizer = Tokenizer()
-    tokenizer.fit_on_texts(list_comment_train)
-    encoded_comment_train = tokenizer.texts_to_sequences(list_comment_train)
+    MODEL = 'LSTM'
+    EMBEDDING = 'Word2vec Google News 300D'
+    MAX_LENGTH = 400
 
-    vocab_size = len(tokenizer.word_index) + 1
-    X_train = pad_sequences(encoded_comment_train, maxlen=MAX_LENGTH, padding='post')
+    X_train, y_train, X_test, vocab_size = preprocess_comments()
 
-    test_df = pd.read_csv('data/test.csv.zip')
-    test_df['comment_text'] = train_df['comment_text'].apply(clean_comment)
-    list_comment_test = list(test_df['comment_text'])
-
-    encoded_comment_test = tokenizer.texts_to_sequences(list_comment_test)
-    X_test = pad_sequences(encoded_comment_test, maxlen=MAX_LENGTH, padding='post')
-
-    word2vec_model: KeyedVectors = KeyedVectors.load_word2vec_format('embeddings/GoogleNews-vectors-negative300.bin',
-                                                                     binary=True)
-    embedding_dim = word2vec_model[0].size
-
-    embedding_matrix = np.zeros((vocab_size, embedding_dim))
-    words = tokenizer.word_index
-
-    for word in words:
-        index = words[word]
-
-        try:
-            vector = word2vec_model[word]
-            embedding_matrix[index] = vector
-        except:
-            pass
+    embedding_matrix = create_embedding_matrix(EMBEDDING)
 
     model = lstm(vocab_size, embedding_dim, embedding_matrix)
-    y_train = train_df[LABELS]
+
     model, history = train_model(model, X_train, y_train)
 
     y_test = model.predict([X_test], batch_size=1024, verbose=1)
@@ -85,6 +59,50 @@ def train_model(model, X_train, y_train):
     history = model.fit(X_train, y_train, epochs=2, validation_split=0.1, batch_size=64, verbose=1)
 
     return model, history
+
+
+def create_embedding_matrix(embedding):
+    if embedding == 'Word2vec Google News 300D':
+        model = KeyedVectors.load_word2vec_format(f'embeddings/{EMBEDDINGS[embedding]}', binary=True)
+
+    embedding_dim = model[0].size
+    embedding_matrix = np.zeros((vocab_size, embedding_dim))
+    words = tokenizer.word_index
+
+    for word in words:
+        index = words[word]
+
+        try:
+            vector = model[word]
+            embedding_matrix[index] = vector
+        except:
+            pass
+
+    return embedding_matrix
+
+
+def preprocess_comments():
+    train_df = pd.read_csv('data/train.csv.zip')
+    train_df['comment_text'] = train_df['comment_text'].apply(clean_comment)
+    list_comment_train = list(train_df['comment_text'])
+
+    tokenizer = Tokenizer()
+    tokenizer.fit_on_texts(list_comment_train)
+    encoded_comment_train = tokenizer.texts_to_sequences(list_comment_train)
+
+    vocab_size = len(tokenizer.word_index) + 1
+    X_train = pad_sequences(encoded_comment_train, maxlen=MAX_LENGTH, padding='post')
+
+    test_df = pd.read_csv('data/test.csv.zip')
+    test_df['comment_text'] = train_df['comment_text'].apply(clean_comment)
+    list_comment_test = list(test_df['comment_text'])
+
+    encoded_comment_test = tokenizer.texts_to_sequences(list_comment_test)
+    X_test = pad_sequences(encoded_comment_test, maxlen=MAX_LENGTH, padding='post')
+
+    y_train = train_df[LABELS]
+
+    return X_train, y_train, X_test, vocab_size
 
 
 def clean_comment(comment):
