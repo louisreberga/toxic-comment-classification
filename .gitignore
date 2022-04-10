@@ -1,5 +1,4 @@
 /embeddings
 /preprocessed_data
-*/.idea/workspace.xml
-*/.idea/tasks.xml
-/__pycache__
+/.idea/
+/__pycache__/

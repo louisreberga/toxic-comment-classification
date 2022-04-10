@@ -3,8 +3,9 @@ from keras.models import Sequential
 from keras.layers import Embedding, Dense, LSTM, GlobalMaxPool1D, Dropout, Bidirectional
 
 
-def cnn():
+def cnn(emb_matrix):
     model = Sequential()
+    model.add(Embedding(VOCAB_SIZE, EMB_DIM, weights=[emb_matrix], input_length=MAX_LENGTH, trainable=False))
     # TODO
 
     return model
@@ -35,15 +36,17 @@ def bidirectional_lstm(emb_matrix):
     return model
 
 
-def gru():
+def gru(emb_matrix):
     model = Sequential()
+    model.add(Embedding(VOCAB_SIZE, EMB_DIM, weights=[emb_matrix], input_length=MAX_LENGTH, trainable=False))
     # TODO
 
     return model
 
 
-def bidirectional_gru():
+def bidirectional_gru(emb_matrix):
     model = Sequential()
+    model.add(Embedding(VOCAB_SIZE, EMB_DIM, weights=[emb_matrix], input_length=MAX_LENGTH, trainable=False))
     # TODO
 
     return model
