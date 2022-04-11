@@ -1,6 +1,7 @@
-from constants import MAX_LENGTH, LABELS
+from constants import LABELS, MAX_LENGTH
 import pandas as pd
 from re import sub
+from os import path, mkdir
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 from nltk.corpus import stopwords
@@ -8,11 +9,12 @@ from pickle import load, dump, HIGHEST_PROTOCOL
 
 
 def read_preprocessed_comments():
-    X_train = pd.read_csv('preprocessed_data/X_train.csv')
-    y_train = pd.read_csv('preprocessed_data/y_train.csv')
-    X_test = pd.read_csv('preprocessed_data/X_test.csv')
-    y_test = pd.read_csv('preprocessed_data/y_test.csv')
-    with open('preprocessed_data/tokenizer.pickle', 'rb') as handle:
+    directory = 'preprocessed_data'
+    X_train = pd.read_csv(f'{directory}/X_train.csv')
+    y_train = pd.read_csv(f'{directory}/y_train.csv')
+    X_test = pd.read_csv(f'{directory}/X_test.csv')
+    y_test = pd.read_csv(f'{directory}/y_test.csv')
+    with open(f'{directory}/tokenizer.pickle', 'rb') as handle:
         tokenizer = load(handle)
 
     return X_train, y_train, X_test, y_test, tokenizer
@@ -52,12 +54,17 @@ def preprocess_comments():
     print('Data padded!\n')
 
     print('Saving data...')
-    print('vocab_size', vocab_size)
-    pd.DataFrame(X_train).to_csv('preprocessed_data/X_train.csv', index=False)
-    pd.DataFrame(y_train).to_csv('preprocessed_data/y_train.csv', index=False)
-    pd.DataFrame(X_test).to_csv('preprocessed_data/X_test.csv', index=False)
-    pd.DataFrame(y_test).to_csv('preprocessed_data/y_test.csv', index=False)
-    with open('preprocessed_data/tokenizer.pickle', 'wb') as handle:
+    # print('vocab_size', vocab_size)
+
+    directory = 'preprocessed_data'
+    if not path.exists(directory):
+        mkdir(directory)
+
+    pd.DataFrame(X_train).to_csv(f'{directory}/X_train.csv', index=False)
+    pd.DataFrame(y_train).to_csv(f'{directory}/y_train.csv', index=False)
+    pd.DataFrame(X_test).to_csv(f'{directory}/X_test.csv', index=False)
+    pd.DataFrame(y_test).to_csv(f'{directory}/y_test.csv', index=False)
+    with open(f'{directory}/tokenizer.pickle', 'wb') as handle:
         dump(tokenizer, handle, protocol=HIGHEST_PROTOCOL)
     print('Data saved!')
 
