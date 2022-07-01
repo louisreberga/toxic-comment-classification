@@ -7,16 +7,7 @@ Here is our results:
 
 | Embedding | CNN | LSTM | Bidirectional LSTM | GRU | Bidirectional GRU |
 | --- | --- | --- | --- |--- |--- |
-| col 3 is      | right-aligned | $1600 |
-| col 2 is      | centered      |   $12 |
-| zebra stripes | are neat      |    $1 |
-
-Embedding CNN & LSTM & Bidirectional LSTM & GRU & Bidirectional GRU \\
-\hline
-GloVe 50D & 0.96677 & 0.97146 & 0.97389 & 0.9712 & 0.97373 \\
-\hline
-GloVe 100D & 0.97205 & 0.97415 & 0.9778 & 0.97322 & 0.97742 \\
-\hline
-GloVe 200D & 0.97147 & 0.97599 & 0.97805 & 0.97702 & 0.97828 \\
-\hline
-GloVe 300D & 0.97249 & 0.97612 & 0.97898 & 0.97669 & 0.97855 \\
+| GloVe 50D | 0.96677 | 0.97146 | 0.97389 | 0.9712 | 0.97373 |
+| GloVe 100D | 0.97205 | 0.97415 | 0.9778 | 0.97322 | 0.97742 |
+| GloVe 200D | 0.97147 | 0.97599 | 0.97805 | 0.97702 | 0.97828 |
+| GloVe 300D | 0.97249 | 0.97612 | 0.97898 | 0.97669 | 0.97855 |
